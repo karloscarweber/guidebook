@@ -7,7 +7,9 @@ Gem::Specification.new do |s|
   s.email       = "me@kow.fm"
   s.files       = ["lib/guidebook.rb"]
   s.add_runtime_dependency 'active_record', '>=7.0.3.1'
+  s.add_runtime_dependency 'sqlite3', '>=1.4.4'
   s.add_runtime_dependency 'standalone-migrations', '>=7.1.0'
   s.homepage    = "https://rubygems.org/gems/guidebook"
   s.license     = "MIT"
 end
+
