@@ -2,7 +2,7 @@
 begin
     require 'active_record'
     require 'sqlite3'
-    require 'standalone_migrations'
+    require 'cairn'
 rescue LoadError => e
     raise MissingLibrary, "ActiveRecord could not be loaded (is it installed?): #{e.message}"
 end
@@ -37,7 +37,7 @@ module Camping
       # The defaults are all for localhosting.
       db_host   = app.options[:db_host]        ||=  'localhost'
       adapter   = app.options[:adapter]        ||=  'sqlite3'
-      database  = app.options[:database]       ||=  'camping'
+      database  = app.options[:database]       ||=  'db/camping.db'
       pool      = app.options[:database_pool]  ||=  5
 
       # Establishes the database connection.
