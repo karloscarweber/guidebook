@@ -3,6 +3,7 @@ source 'https://rubygems.org'
 gem 'cairn',  '~> 7.1.1'
 gem 'sqlite3'
 gem 'rake', '>= 10.0'
+gem 'kdl'
 
 group :test do
   gem 'minitest', '~> 5.0'

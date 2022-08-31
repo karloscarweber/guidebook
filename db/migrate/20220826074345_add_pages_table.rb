@@ -6,12 +6,6 @@ class AddPagesTable < ActiveRecord::Migration[7.0]
           # This gives us created_at and updated_at
           t.timestamps
       end
-      create_table "doesqueries_pages" do |t|
-          t.string :title
-          t.text :content
-          # This gives us created_at and updated_at
-          t.timestamps
-      end
   end
   def down
       drop_table "pages"

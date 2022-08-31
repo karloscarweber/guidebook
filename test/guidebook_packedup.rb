@@ -18,7 +18,7 @@ begin
       assert_equal("localhost", app.options[:db_host], "The host is wrong: #{app.options[:db_host]}")
       assert_equal("sqlite3", app.options[:adapter], "The adapter is wrong: #{app.options[:adapter]}")
       assert_equal("db/camping.db", app.options[:database], "The default database is wrong: #{app.options[:database]}")
-      assert_equal(5, app.options[:database_pool], "the datasbase pool value is wrong: #{app.options[:database_pool]}")
+      assert_equal(5, app.options[:pool], "the datasbase pool value is wrong: #{app.options[:pool]}")
     end
 
   end

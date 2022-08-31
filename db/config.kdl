@@ -1,0 +1,6 @@
+// config.kdl
+
+  database {
+    development adapter="sqlite3" database="db/camping.db" host="localhost" pool=5 timeout=5000
+    production adapter="sqlite3" database="db/camping.db" host="localhost" pool=5 timeout=5000
+  }
