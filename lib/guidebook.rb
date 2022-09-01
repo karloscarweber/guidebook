@@ -29,22 +29,34 @@ module Camping
       end
     end
 
+    # this is the private settings for database defaults.
+    def self.db_defaults
+    {
+      default: {
+        host:  'localhost',
+        adapter:  'sqlite3',
+        database:  'db/camping.db',
+        pool:  5
+      }
+    }
+    end
+
     def self.setup(app, *a, &block)
       app.use ActiveRecordCloser
 
       # Puts the Base Class into your apps' Models module.
       app::Models.module_eval $AR_TO_BASE
 
-      puts "Camping Setup called."
-
-      # The defaults are all for local hosting.
-      db_host   = app.options[:db_host]        ||=  'localhost'
-      adapter   = app.options[:adapter]        ||=  'sqlite3'
-      database  = app.options[:database]       ||=  'db/camping.db'
-      pool      = app.options[:pool]           ||=  5
+      defaults = self.db_defaults
 
       stored_config = self.get_config # Grab settings in db/config.kdl
       environment = ENV['environment'] ||= "development"
+
+      # The defaults are all for local hosting.
+      db_host   = defaults[:default][:host]
+      adapter   = defaults[:default][:adapter]
+      database  = defaults[:default][:database]
+      pool      = defaults[:default][:pool]
 
       # Loop through environments set in the config.kdl file.
       # Settings that are set in app.options take precedence to whatever is set
@@ -67,7 +79,7 @@ module Camping
           database  = prod[:database] if prod.has_key? :database
           pool      = prod[:pool] if prod.has_key? :pool
         end
-      else "development"
+      when "development"
         if stored_config.has_key? :development
           prod = stored_config[:development]
           db_host   = prod[:db_host] if prod.has_key? :db_host
@@ -76,6 +88,12 @@ module Camping
           pool      = prod[:pool] if prod.has_key? :pool
         end
       end
+
+      # Overwrite any settings with directly added app settings.
+      db_host   = app.options[:db_host]   ||=  db_host
+      adapter   = app.options[:adapter]   ||=  adapter
+      database  = app.options[:database]  ||=  database
+      pool      = app.options[:pool]      ||=  pool
 
       # Establishes the database connection.
       # Because we're doing all of this in the setup method
@@ -97,30 +115,15 @@ module Camping
     # Example syntax:
     #
     #    database {
-    #      environment "development" \
-    #        adapter="sqlite3" \
-    #        database="db/camping.db" \
-    #        host="localhost" \
-    #        pool=5 \
-    #        timeout=5000
-    #    }
-    #
-    # You can also write it like this:
-    #
-    #    database {
-    #      environment "development" adapter="sqlite3" database="db/camping.db" host="localhost" pool=5 timeout=5000
-    #      environment "production" adapter="sqlite3" database="db/camping.db" host="localhost" pool=5 timeout=5000
+    #     default adapter="sqlite3" database="db/camping.db" host="localhost" pool=5 timeout=5000
+    #     development
+    #     production adapter="postgres" database=""
     #    }
     #
     # This can probably be refactored down to something more simple.
     def self.get_config
-      files = Dir.glob("**/db/*.kdl")
-      config_file = nil
-      # try to get the config_file for db.
-      files.each do |file|
-        f = file.split("/").last
-        config_file = file if f == "config.kdl"
-      end
+
+      config_file = self.get_config_file
 
       kdl_doc = nil
       if config_file
@@ -138,11 +141,7 @@ module Camping
             # parse database
             d.children.each do |en|
 
-              if en.properties.count < 1
-                next
-              else
-                env_name = en.name.to_sym
-              end
+              env_name = en.name.to_sym
 
               # parse the settings for each environment
               db_sets[env_name] = {}
@@ -156,22 +155,42 @@ module Camping
       else
         # puts "No KDL document found"
       end
-      db_sets
+
+      # This merges the default data from the config file, or our lib defaults
+      # into each environment. If no kdl default is found then our lib defaults
+      # are used.
+      new_sets, dfault = {}, db_sets[:default] ||= self.db_defaults[:default]
+      db_sets.each { |d| new_sets[d[0]] = dfault.merge(d[1]) }
+      new_sets
     end
 
-    # TO DO:
-    # [ ] Map migration commands to Rake automatically somehow.
-    # [ ] Map Generators to rake somehow too.
-    # [x] Have a default spot that settings are grabbed from. (/db/config.kdl)
-    # [ ] Have a setting where a database connection string is grabbed by default
+    # get kdl files
+    # returns the config file
+    # param[search_pattern] is optional, but defaults to look everywhere it can.
+    def self.get_config_file(search_pattern = "**/db/*.kdl")
+      # get file location,
+      files = Dir.glob(search_pattern)
+      config_file = nil
+      # try to get the config_file for db.
+      files.each do |file|
+        f = file.split("/").first
+        l = file.split("/").last
 
-    # Notes:
-    # It would be cool If we could map Active Record generators to rake tasks
-    # automatically from Plugins.
-    #
-    # Camping needs a place to mount Command line arguments automagically.
-    # migrations is something that needs to be universal and good and stuff.
-    #
+        # This logic prioritizes the db/config file in the root directory, This
+        # assumes that a Deep search is conducted and that more than one kdl
+        # file was found. Otherwise a deep, specific search will probably get
+        # the specific file you want.
+        if config_file != nil
+          if f == "db" && config_file.split("/").first != "db"
+            config_file = file if l == "config.kdl"
+          end
+        else
+          config_file = file if l == "config.kdl"
+        end
+
+      end
+      config_file
+    end
 
   end
 end

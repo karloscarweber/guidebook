@@ -10,6 +10,7 @@ end
 require 'camping'
 require 'minitest/autorun'
 require 'minitest'
+require 'minitest/spec'
 require 'rack/test'
 require "minitest/reporters"
 # require ''

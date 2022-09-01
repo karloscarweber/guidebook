@@ -11,6 +11,7 @@ task :test => 'test:all'
 namespace 'test' do
   Rake::TestTask.new('all') do |t|
     t.libs << 'test'
+    t.libs.push 'lib'
     t.test_files = FileList['test/guidebook_*.rb']
   end
 end
