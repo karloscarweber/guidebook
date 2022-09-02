@@ -138,16 +138,27 @@ module Camping
     #    }
     #
     # This can probably be refactored down to something more simple.
-    def self.get_config
+    def self.get_config(provided_config_file = nil)
 
-      config_file = self.get_config_file
+      config_file = provided_config_file
+      config_file = self.get_config_file unless provided_config_file
 
       kdl_doc = nil
-      if config_file
-        kdl_string = File.open(config_file).read
-        kdl_doc = KDL.parse_document(kdl_string)
-      end
+      kdl_doc = self.parse_kdl(config_file)
 
+      # database settings dictionary
+      db_sets = self.map_kdl(kdl_doc)
+
+      # This merges the default data from the config file, or our lib defaults
+      # into each environment. If no kdl default is found then our lib defaults
+      # are used.
+      new_sets, dfault = {}, db_sets[:default] ||= self.db_defaults[:default]
+      db_sets.each { |d| new_sets[d[0]] = dfault.merge(d[1]) }
+      new_sets
+    end
+
+
+    def self.map_kdl(kdl_doc=nil)
       # database settings dictionary
       db_sets = {}
       if kdl_doc
@@ -172,13 +183,7 @@ module Camping
       else
         # puts "No KDL document found"
       end
-
-      # This merges the default data from the config file, or our lib defaults
-      # into each environment. If no kdl default is found then our lib defaults
-      # are used.
-      new_sets, dfault = {}, db_sets[:default] ||= self.db_defaults[:default]
-      db_sets.each { |d| new_sets[d[0]] = dfault.merge(d[1]) }
-      new_sets
+      db_sets
     end
 
     # parses a kdl file into a kdl document Object.
@@ -235,26 +240,26 @@ module Camping
       yaml_string << "# Modify db/config.kdl instead. \n"
 
       # A is a proc to help generate the YAML file.
-      add_row = -> (yammy, conf) {
+      add_row = -> (yammy, conf, name) {
         yaml_string <<  "\n"
-        yaml_string <<  "default: \n"
+        yaml_string <<  "#{name}: \n"
         yaml_string <<  "  adapter: #{conf[:adapter]}\n"   if conf.has_key? :adapter
         yaml_string <<  "  database: #{conf[:database]}\n" if conf.has_key? :database
-        yaml_string <<  "  host: #{conf[:host]}\n"      if conf.has_key? :host
+        yaml_string <<  "  host: #{conf[:host]}\n"         if conf.has_key? :host
         yaml_string <<  "  pool: #{conf[:pool]}\n"         if conf.has_key? :pool
         yaml_string <<  "  timeout: #{conf[:timeout]}\n"   if conf.has_key? :timeout
       }
 
       if config.has_key? :default
-        add_row.(yaml_string, config[:default])
+        add_row.(yaml_string, config[:default], "default")
       end
 
       if config.has_key? :development
-        add_row.(yaml_string, config[:development])
+        add_row.(yaml_string, config[:development], "development")
       end
 
       if config.has_key? :production
-        add_row.(yaml_string, config[:production])
+        add_row.(yaml_string, config[:production], "production")
       end
 
       # write the thing.

@@ -20,10 +20,17 @@ begin
     end
 
     def setup
-      @config = Camping::GuideBook.get_config
+      # @config = Camping::GuideBook.get_config
+      @kdl = Camping::GuideBook.parse_kdl("db/config.kdl")
     end
 
-    def test_the_thing
+    # Test that we parsed kdl
+    def test_that_we_parse_kdl
+      assert_equal 'KDL::Document', @kdl.class.to_s, "The returned object is nil, or at least it's not of class KDL::Document"
+    end
+
+    # Test that we parsed the right data.
+    def test_that_we_parsed_the_right_data
       # kdl_class.to_s == 'KDL::Document'
       assert false, "You did not write the test yet."
     end

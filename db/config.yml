@@ -1,7 +1,7 @@
 # db/config.yml 
 
 # This is a generated File. Do not directly alter this file and expect any changes.
-# Modify config.kdl instead. 
+# Modify db/config.kdl instead. 
 
 default: 
   adapter: sqlite3
@@ -10,14 +10,14 @@ default:
   pool: 5
   timeout: 5000
 
-default: 
+development: 
   adapter: sqlite3
   database: db/camping.db
   host: localhost
   pool: 5
   timeout: 5000
 
-default: 
+production: 
   adapter: postgres
   database: kow
   host: localhost
