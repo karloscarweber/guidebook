@@ -14,6 +14,8 @@
 - [x] Have a default spot that settings are grabbed from. (/db/config.kdl)
 - [x] Have a setting where a database connection string is grabbed by default
 - [ ] Test that settings added using #set on the Camping app take precedence.
+- [ ] Add an example Camping App using the Extension.
+- [ ] Generate config.yml for the rake tasks stuff thing. It expects it.
 
 # Notes:
 It would be cool If we could map Active Record generators to rake tasks automatically from Plugins.

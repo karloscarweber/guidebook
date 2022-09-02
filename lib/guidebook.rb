@@ -47,9 +47,35 @@ module Camping
       # Puts the Base Class into your apps' Models module.
       app::Models.module_eval $AR_TO_BASE
 
+      stored_config = self.get_config # Grab settings in db/config.kdl
+
+      # Expects an array, hence parallel assignment. Should probably always get one too.
+      config_dict = self.squash_settings(app, stored_config)
+      environment = ENV['environment'] ||= "development"
+      db_host, adapter, database, pool = config_dict[:collapsed_config]
+
+      # does that generatin action!
+      generate_config_yml(config_dict[:stored_config])
+
+      # Establishes the database connection.
+      # Because we're doing all of this in the setup method
+      # The connection will take place when this gear is packed.
+      app::Models::Base.establish_connection(
+        :adapter => adapter,
+        :database => database,
+        :host => db_host,
+        :pool => pool
+      )
+      # Interesting side effect. If we pack this gear into more than one app,
+      # Then each app will have a database connection to manage.
+    end
+
+    # squash settings basically collapses all the settings that we have into something
+    # truly beautiful.
+    def self.squash_settings(app, config)
       defaults = self.db_defaults
 
-      stored_config = self.get_config # Grab settings in db/config.kdl
+      stored_config = config
       environment = ENV['environment'] ||= "development"
 
       # The defaults are all for local hosting.
@@ -95,18 +121,9 @@ module Camping
       database  = app.options[:database]  ||=  database
       pool      = app.options[:pool]      ||=  pool
 
-      # Establishes the database connection.
-      # Because we're doing all of this in the setup method
-      # The connection will take place when this gear is packed.
-      app::Models::Base.establish_connection(
-        :adapter => adapter,
-        :database => database,
-        :host => db_host,
-        :pool => pool
-      )
-      # Interesting side effect. If we pack this gear into more than one app,
-      # Then each app will have a database connection to manage.
+      { collapsed_config: [db_host, adapter, database, pool], stored_config: stored_config}
     end
+
 
     # #get_config
     # searches for any kdl document inside of a db folder.
@@ -164,9 +181,18 @@ module Camping
       new_sets
     end
 
+    # parses a kdl file into a kdl document Object.
+    # returns nil if it's false. Also assumes that the file is exists.
+    def self.parse_kdl(config_file = nil)
+      kdl_string = File.open(config_file).read
+      kdl_doc = KDL.parse_document(kdl_string)
+      kdl_doc
+    end
+
     # get kdl files
     # returns the config file
     # param[search_pattern] is optional, but defaults to look everywhere it can.
+    # returns nil if there is nothing to find.
     def self.get_config_file(search_pattern = "**/db/*.kdl")
       # get file location,
       files = Dir.glob(search_pattern)
@@ -181,7 +207,8 @@ module Camping
         # file was found. Otherwise a deep, specific search will probably get
         # the specific file you want.
         if config_file != nil
-          if f == "db" && config_file.split("/").first != "db"
+          cff = config_file.split("/").first
+          if f == "db" && cff != "db"
             config_file = file if l == "config.kdl"
           end
         else
@@ -190,6 +217,50 @@ module Camping
 
       end
       config_file
+    end
+
+    # Generates a config.yml like a complete badass.
+    # necessary for political reasons. Cairn, which depends
+    # on standalone-migrations, expects a config.yml in the db/ directory.
+    # So we'll generate one. It's only used for running migrations.
+    # maybe we'll get rid of this soon.... hope so.
+    def self.generate_config_yml(config=nil)
+
+      # Freak out if we config is nil
+      raise StandardError, "No database configurations were provided." unless config != nil
+
+      # String_to_write_to_file
+      yaml_string = "# db/config.yml \n\n"
+      yaml_string << "# This is a generated File. Do not directly alter this file and expect any changes.\n"
+      yaml_string << "# Modify db/config.kdl instead. \n"
+
+      # A is a proc to help generate the YAML file.
+      add_row = -> (yammy, conf) {
+        yaml_string <<  "\n"
+        yaml_string <<  "default: \n"
+        yaml_string <<  "  adapter: #{conf[:adapter]}\n"   if conf.has_key? :adapter
+        yaml_string <<  "  database: #{conf[:database]}\n" if conf.has_key? :database
+        yaml_string <<  "  host: #{conf[:host]}\n"      if conf.has_key? :host
+        yaml_string <<  "  pool: #{conf[:pool]}\n"         if conf.has_key? :pool
+        yaml_string <<  "  timeout: #{conf[:timeout]}\n"   if conf.has_key? :timeout
+      }
+
+      if config.has_key? :default
+        add_row.(yaml_string, config[:default])
+      end
+
+      if config.has_key? :development
+        add_row.(yaml_string, config[:development])
+      end
+
+      if config.has_key? :production
+        add_row.(yaml_string, config[:production])
+      end
+
+      # write the thing.
+      File.open('db/config.yml', 'w') { |file|
+        file.write(yaml_string)
+      }
     end
 
   end
