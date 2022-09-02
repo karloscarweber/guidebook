@@ -52,7 +52,7 @@ module Camping
       # Expects an array, hence parallel assignment. Should probably always get one too.
       config_dict = self.squash_settings(app, stored_config)
       environment = ENV['environment'] ||= "development"
-      db_host, adapter, database, pool = config_dict[:collapsed_config]
+      host, adapter, database, pool = config_dict[:collapsed_config]
 
       # does that generatin action!
       generate_config_yml(config_dict[:stored_config])
@@ -63,67 +63,12 @@ module Camping
       app::Models::Base.establish_connection(
         :adapter => adapter,
         :database => database,
-        :host => db_host,
+        :host => host,
         :pool => pool
       )
       # Interesting side effect. If we pack this gear into more than one app,
       # Then each app will have a database connection to manage.
     end
-
-    # squash settings basically collapses all the settings that we have into something
-    # truly beautiful.
-    def self.squash_settings(app, config)
-      defaults = self.db_defaults
-
-      stored_config = config
-      environment = ENV['environment'] ||= "development"
-
-      # The defaults are all for local hosting.
-      db_host   = defaults[:default][:host]
-      adapter   = defaults[:default][:adapter]
-      database  = defaults[:default][:database]
-      pool      = defaults[:default][:pool]
-
-      # Loop through environments set in the config.kdl file.
-      # Settings that are set in app.options take precedence to whatever is set
-      # in cb/config.kdl Also because defaults are already set above, they are
-      # only replaced if there is a value, no value, no replacement.
-      case environment
-      when "production"
-        if stored_config.has_key? :production
-          prod = stored_config[:production]
-          db_host   = prod[:db_host] if prod.has_key? :db_host
-          adapter   = prod[:adapter] if prod.has_key? :adapter
-          database  = prod[:database] if prod.has_key? :database
-          pool      = prod[:pool] if prod.has_key? :pool
-        end
-      when "test"
-        if stored_config.has_key? :test
-          prod = stored_config[:test]
-          db_host   = prod[:db_host] if prod.has_key? :db_host
-          adapter   = prod[:adapter] if prod.has_key? :adapter
-          database  = prod[:database] if prod.has_key? :database
-          pool      = prod[:pool] if prod.has_key? :pool
-        end
-      when "development"
-        if stored_config.has_key? :development
-          prod = stored_config[:development]
-          db_host   = prod[:db_host] if prod.has_key? :db_host
-          adapter   = prod[:adapter] if prod.has_key? :adapter
-          database  = prod[:database] if prod.has_key? :database
-          pool      = prod[:pool] if prod.has_key? :pool
-        end
-      end
-
-      # Overwrite any settings with directly added app settings.
-      db_host   = app.options[:db_host]   ||=  db_host
-      adapter   = app.options[:adapter]   ||=  adapter
-      database  = app.options[:database]  ||=  database
-      pool      = app.options[:pool]      ||=  pool
-
-      { collapsed_config: [db_host, adapter, database, pool], stored_config: stored_config}
-    end
-
 
     # #get_config
     # searches for any kdl document inside of a db folder.
@@ -157,6 +102,59 @@ module Camping
       new_sets
     end
 
+    # squash settings basically collapses all the settings that we have into something
+    # truly beautiful.
+    def self.squash_settings(app, config)
+      defaults = self.db_defaults
+
+      stored_config = config
+      environment = ENV['environment'] ||= "development"
+
+      # The defaults are all for local hosting.
+      host      = defaults[:default][:host]
+      adapter   = defaults[:default][:adapter]
+      database  = defaults[:default][:database]
+      pool      = defaults[:default][:pool]
+
+      # Loop through environments set in the config.kdl file.
+      # Settings that are set in app.options take precedence to whatever is set
+      # in cb/config.kdl Also because defaults are already set above, they are
+      # only replaced if there is a value, no value, no replacement.
+      case environment
+      when "production"
+        if stored_config.has_key? :production
+          prod = stored_config[:production]
+          host      = prod[:host] if prod.has_key? :host
+          adapter   = prod[:adapter] if prod.has_key? :adapter
+          database  = prod[:database] if prod.has_key? :database
+          pool      = prod[:pool] if prod.has_key? :pool
+        end
+      when "test"
+        if stored_config.has_key? :test
+          prod = stored_config[:test]
+          host      = prod[:host] if prod.has_key? :host
+          adapter   = prod[:adapter] if prod.has_key? :adapter
+          database  = prod[:database] if prod.has_key? :database
+          pool      = prod[:pool] if prod.has_key? :pool
+        end
+      when "development"
+        if stored_config.has_key? :development
+          prod = stored_config[:development]
+          host      = prod[:host] if prod.has_key? :host
+          adapter   = prod[:adapter] if prod.has_key? :adapter
+          database  = prod[:database] if prod.has_key? :database
+          pool      = prod[:pool] if prod.has_key? :pool
+        end
+      end
+
+      # Overwrite any settings with directly added app settings.
+      host      = app.options[:host]   ||=  host
+      adapter   = app.options[:adapter]   ||=  adapter
+      database  = app.options[:database]  ||=  database
+      pool      = app.options[:pool]      ||=  pool
+
+      { collapsed_config: [host, adapter, database, pool], stored_config: stored_config}
+    end
 
     def self.map_kdl(kdl_doc=nil)
       # database settings dictionary
@@ -229,7 +227,9 @@ module Camping
     # on standalone-migrations, expects a config.yml in the db/ directory.
     # So we'll generate one. It's only used for running migrations.
     # maybe we'll get rid of this soon.... hope so.
-    def self.generate_config_yml(config=nil)
+    #
+    # returns an integer of the number of characters the resulting file has.
+    def self.generate_config_yml(config=nil,write_location='db/config.yml')
 
       # Freak out if we config is nil
       raise StandardError, "No database configurations were provided." unless config != nil
@@ -263,7 +263,7 @@ module Camping
       end
 
       # write the thing.
-      File.open('db/config.yml', 'w') { |file|
+      File.open(write_location, 'w') { |file|
         file.write(yaml_string)
       }
     end

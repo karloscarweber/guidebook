@@ -7,18 +7,7 @@ begin
   ENV["environment"] = "development"
   load File.expand_path('../apps/has_config.rb', __FILE__)
 
-  # def stand_up_db
-  #   ActiveRecord::Base.establish_connection(:adapter => 'sqlite3', :database => ':memory:')
-  # end
-
-
   class HasConfig::Test < TestCase
-
-    Page = HasConfig::Models::Page
-    def nuke_db
-      Page.new(title: "Hiking", content: "Fishing").save
-      Page.all.each(&:delete)
-    end
 
     def setup
       @configs = Camping::GuideBook.get_config
@@ -28,7 +17,7 @@ begin
     # expec it to have the correct settings.
     def test_has_correct_settings
       assert_equal @configs[:development][:adapter],  @options[:adapter],  "Database adapter does not match the expected settings: #{@options}"
-      assert_equal @configs[:development][:host],     @options[:db_host],  "Database host does not match the expected settings: #{@options}"
+      assert_equal @configs[:development][:host],     @options[:host],  "Database host does not match the expected settings: #{@options}"
       assert_equal @configs[:development][:database], @options[:database], "Database database name does not match the expected settings: #{@options}"
       assert_equal @configs[:development][:pool],     @options[:pool],     "Database pool does not match the expected settings: #{@options}"
     end
@@ -61,5 +50,5 @@ begin
 
   end
 rescue MissingLibrary
-  warn "Skipping migration tests"
+  warn "Skipping Has Config tests"
 end

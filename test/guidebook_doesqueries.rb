@@ -45,5 +45,5 @@ begin
 
   end
 rescue MissingLibrary
-  warn "Skipping migration tests"
+  warn "Skipping Does Queries tests"
 end

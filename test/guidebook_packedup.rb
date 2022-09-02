@@ -15,7 +15,7 @@ begin
 
     # No Options were added so let's see if it's all good here.
     def test_default_options_were_loaded
-      assert_equal("localhost", app.options[:db_host], "The host is wrong: #{app.options[:db_host]}")
+      assert_equal("localhost", app.options[:host], "The host is wrong: #{app.options[:host]}")
       assert_equal("sqlite3", app.options[:adapter], "The adapter is wrong: #{app.options[:adapter]}")
       assert_equal("db/camping.db", app.options[:database], "The default database is wrong: #{app.options[:database]}")
       assert_equal(5, app.options[:pool], "the datasbase pool value is wrong: #{app.options[:pool]}")
@@ -23,5 +23,5 @@ begin
 
   end
 rescue MissingLibrary
-  warn "Skipping migration tests"
+  warn "Skipping PackedUP tests"
 end

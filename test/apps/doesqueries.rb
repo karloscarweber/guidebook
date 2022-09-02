@@ -9,7 +9,7 @@ Camping.goes :Doesqueries
 module Doesqueries
 
   set :database, 'db/camping.db'
-  set :db_host, 'localhost'
+  set :host, 'localhost'
 
   pack Camping::GuideBook
 end
