@@ -1,8 +1,6 @@
 require 'test_helper'
 require 'fileutils'
 
-# $:.unshift File.dirname(__FILE__) + '/../' # I think this will let us see db folder
-
 begin
   ENV["environment"] = "development"
   load File.expand_path('../apps/has_config.rb', __FILE__)
@@ -44,9 +42,11 @@ begin
     end
 
     # tests if we can override the default settings in the Camping Startup.
-    # def test_can_override_setttings
-    #   HasConfig.pack Camping::GuideBook
-    # end
+    def test_can_override_setttings
+      # HasConfig.set :database, "database_url"
+      # HasConfig.pack Camping::GuideBook
+      assert false, "Test not written yet."
+    end
 
   end
 rescue MissingLibrary

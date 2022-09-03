@@ -13,7 +13,6 @@ require 'minitest'
 require 'minitest/spec'
 require 'rack/test'
 require "minitest/reporters"
-# require ''
 
 Minitest::Reporters.use! [Minitest::Reporters::DefaultReporter.new(:color => true)]
 

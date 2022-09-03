@@ -51,7 +51,6 @@ module Camping
 
       # Expects an array, hence parallel assignment. Should probably always get one too.
       config_dict = self.squash_settings(app, stored_config)
-      environment = ENV['environment'] ||= "development"
       host, adapter, database, pool = config_dict[:collapsed_config]
 
       # does that generatin action!

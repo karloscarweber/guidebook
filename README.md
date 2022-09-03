@@ -15,7 +15,9 @@
 - [x] Have a setting where a database connection string is grabbed by default
 - [ ] Test that settings added using #set on the Camping app take precedence.
 - [ ] Add an example Camping App using the Extension.
-- [ ] Generate config.yml for the rake tasks stuff thing. It expects it.
+- [x] Generate config.yml for the rake tasks stuff thing. It expects it.
+- [ ] Support database_url, and using environment variables as the database thing.
+- [ ] Test Migrations across multiple databases
 
 # Notes:
 It would be cool If we could map Active Record generators to rake tasks automatically from Plugins.

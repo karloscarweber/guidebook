@@ -17,5 +17,5 @@ namespace 'test' do
   end
 end
 
-# StandaloneMigrations Loads the tasks into the rake file, but we need to do this differently because we're not using a db/config.yml anymore. We're using a config.kdl. Maybe generate a database config yml file for the Rails thing?
+# This should be loaded in a Rake file but how do I test that?
 # StandaloneMigrations::Tasks.load_tasks
