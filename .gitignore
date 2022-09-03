@@ -2,3 +2,4 @@
 db/camping.db
 db/config.yml
 db/test_config*.yml
+test/tmp/

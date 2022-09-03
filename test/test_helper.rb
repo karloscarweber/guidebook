@@ -68,3 +68,70 @@ end
 #   Page.all.each(&:delete)
 # end
 # # Stand up a whole camping app here:
+
+
+module ComandLineCommands
+  # Useful functinos from standalone-migrations
+
+  # write file
+  def write(file, content)
+    raise "cannot write nil" unless file
+    file = tmp_file(file)
+    folder = File.dirname(file)
+    `mkdir -p #{folder}` unless File.exist?(folder)
+    File.open(file, 'w') { |f| f.write content }
+  end
+
+  # read file
+  def read(file)
+    File.read(tmp_file(file))
+  end
+
+  # tmp_file, gets the temp file
+  def tmp_file(file)
+    "test/tmp/#{file}"
+  end
+
+  # runs a command on the comand line, in the test directory
+  def run_cmd(cmd)
+    result = `cd test/tmp && #{cmd} 2>&1`
+    raise result unless $?.success?
+    result
+  end
+
+  def schema
+    ENV['SCHEMA'] || "db/schema.rb"
+  end
+
+  # writes a rakefile
+  def write_rakefile(config=nil)
+      write 'Rakefile', <<-TXT
+$LOAD_PATH.unshift '#{File.expand_path('lib')}'
+begin
+  require "cairn"
+  StandaloneMigrations::Tasks.load_tasks
+rescue LoadError => e
+  puts "gem install cairn to get db:migrate:* tasks! (Error: \#{e})"
+end
+TXT
+  end
+
+  def before_cmd_actions
+    StandaloneMigrations::Configurator.instance_variable_set(:@env_config, nil)
+    `rm -rf test/tmp` if File.exist?('test/tmp')
+    `mkdir test/tmp`
+    write_rakefile
+    write(schema, '')
+    write 'db/config.yml', <<-TXT
+development:
+  adapter: sqlite3
+  database: db/development.sql
+test:
+  adapter: sqlite3
+  database: db/test.sql
+production:
+  adapter: sqlite3
+  database: db/production.sql
+    TXT
+  end
+end

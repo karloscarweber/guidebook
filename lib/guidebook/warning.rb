@@ -6,7 +6,7 @@ module Camping
     def self.kdl_error_message(kdl_string="",error_message="" )
       # parse error message to get line number and column:
       m = error_message.match( /\((\d)+:(\d)\)/ )
-      line, column = m[1].to_i, m[2].to_i
+      line = m[1].to_i
       lines = kdl_string.split( "\n" )
 
       em = "\n"
