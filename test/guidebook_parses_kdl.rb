@@ -1,8 +1,6 @@
-require 'fileutils'
+require 'test_helper'
 
 ENV["environment"] = "development"
-
-# require_relative '../../lib/guidebook.rb'
 
 $:.unshift File.dirname(__FILE__) + '/../../' # I think this will let us see db folder
 
@@ -35,12 +33,21 @@ class ParseKDL::Test < TestCase
   end
 
   def test_that_we_get_an_error_when_the_kdl_is_bad
-    assert false, "Test not written yet."
+    Camping::GuideBook.parse_kdl("db/bad.kdl", true)
+    last_warning = Camping::GuideBook::WARNINGS.last
+    test_string = <<-RUBY
+\n3:     default adapter="sqlite3" database="db/camping.db" host="localhost" pool=5 timeout=5000
+4:     development
+5:     production adapter="postgres" database="kow"
+6:   }
+7:\s
+RUBY
+    assert_equal test_string, last_warning, "Error messages written are not what we expected."
   end
 
-  def test_that_we_get_the_right_error_when_the_kdl_is_bad
-    assert false, "Test not written yet."
-  end
+  # def test_that_we_get_the_right_error_when_the_kdl_is_bad
+  #   assert false, "Test not written yet."
+  # end
 
   # Test that we parsed the right data.
   # It's unmerged with our default settings.

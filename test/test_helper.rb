@@ -13,6 +13,8 @@ require 'minitest'
 require 'minitest/spec'
 require 'rack/test'
 require "minitest/reporters"
+require_relative '../lib/guidebook.rb'
+require 'fileutils'
 
 Minitest::Reporters.use! [Minitest::Reporters::DefaultReporter.new(:color => true)]
 

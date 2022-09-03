@@ -1,9 +1,28 @@
 require 'test_helper'
-require 'fileutils'
 
 begin
   ENV["environment"] = "development"
-  load File.expand_path('../apps/has_config.rb', __FILE__)
+
+  # $:.unshift File.dirname(__FILE__) + '/../../' # I think this will let us see db folder
+
+  Camping.goes :HasConfig
+
+  module HasConfig
+
+    # host      = app.options[:host]      ||=  host
+    # adapter   = app.options[:adapter]   ||=  adapter
+    # database  = app.options[:database]  ||=  database
+    # pool      = app.options[:pool]      ||=  pool
+
+    set :host, "outerspace"
+
+    pack Camping::GuideBook
+  end
+  module HasConfig
+    module Models
+      class Page < Base; end
+    end
+  end
 
   class HasConfig::Test < TestCase
 
@@ -12,10 +31,12 @@ begin
       @options = HasConfig.options
     end
 
-    # expec it to have the correct settings.
+    # expect it to have the correct settings.
+    # This includes overwriting some settings when a setting is set.
     def test_has_correct_settings
       assert_equal @configs[:development][:adapter],  @options[:adapter],  "Database adapter does not match the expected settings: #{@options}"
-      assert_equal @configs[:development][:host],     @options[:host],  "Database host does not match the expected settings: #{@options}"
+      assert_equal 'outerspace', @options[:host],  "Database host does not match the expected settings: #{@options}"
+      assert @options[:host] != 'localhost',  "Database host does not match the expected settings: #{@options}"
       assert_equal @configs[:development][:database], @options[:database], "Database database name does not match the expected settings: #{@options}"
       assert_equal @configs[:development][:pool],     @options[:pool],     "Database pool does not match the expected settings: #{@options}"
     end
@@ -42,13 +63,13 @@ begin
     end
 
     # tests if we can override the default settings in the Camping Startup.
-    def test_can_override_setttings
-      # HasConfig.set :database, "database_url"
-      # HasConfig.pack Camping::GuideBook
-      assert false, "Test not written yet."
-    end
+    # def test_can_override_setttings
+    #   HasConfig.set :database, "database_url"
+    #   HasConfig.pack Camping::GuideBook
+    #   assert_equal false, HasConfig.options['database'], "Test not written yet."
+    # end
 
   end
-rescue MissingLibrary
+rescue
   warn "Skipping Has Config tests"
 end

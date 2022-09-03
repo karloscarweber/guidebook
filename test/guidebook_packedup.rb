@@ -1,5 +1,4 @@
 require 'test_helper'
-require 'fileutils'
 
 begin
   load File.expand_path('../apps/packedup.rb', __FILE__)
@@ -22,6 +21,6 @@ begin
     end
 
   end
-rescue MissingLibrary
+rescue
   warn "Skipping PackedUP tests"
 end

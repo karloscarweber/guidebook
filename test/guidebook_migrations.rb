@@ -1,5 +1,4 @@
 require 'test_helper'
-require 'fileutils'
 
 begin
   # load File.expand_path('../apps/migrations.rb', __FILE__)

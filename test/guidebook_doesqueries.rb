@@ -1,5 +1,4 @@
 require 'test_helper'
-require 'fileutils'
 
 begin
   load File.expand_path('../apps/doesqueries.rb', __FILE__)
@@ -44,6 +43,6 @@ begin
     end
 
   end
-rescue MissingLibrary
+rescue
   warn "Skipping Does Queries tests"
 end

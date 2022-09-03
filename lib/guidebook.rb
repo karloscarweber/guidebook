@@ -1,3 +1,4 @@
+require 'guidebook/warning'
 require 'guidebook/version'
 
 begin
@@ -56,6 +57,12 @@ module Camping
 
       # does that generatin action!
       generate_config_yml(config_dict[:stored_config])
+
+      # store the squashed options into the app as options
+      # app.set :adapter, adapter
+      # app.set :database, database
+      # app.set :host, host
+      # app.set :pool, pool
 
       # Establishes the database connection.
       # Because we're doing all of this in the setup method
@@ -186,9 +193,22 @@ module Camping
 
     # parses a kdl file into a kdl document Object.
     # returns nil if it's false. Also assumes that the file is exists.
-    def self.parse_kdl(config_file = nil)
+    # an optional silence_warnings parameter is set to false. This is used for
+    # testing.
+    def self.parse_kdl(config_file = nil, silence_warnings = false)
       kdl_string = File.open(config_file).read
-      kdl_doc = KDL.parse_document(kdl_string)
+
+      begin
+        kdl_doc = KDL.parse_document(kdl_string)
+      rescue => error
+        # parse error message to get line number and column:
+        message = Camping::GuideBook.kdl_error_message(kdl_string, error.message)
+        m = error.message.match( /\((\d)+:(\d)\)/ )
+        line, column = m[1].to_i, m[2].to_i
+
+        warn("\nError parsing config: #{config_file}, on line: #{line}, at column: #{column}.", message, "#{error.message}", uplevel: 1) unless silence_warnings
+      end
+
       kdl_doc
     end
 
