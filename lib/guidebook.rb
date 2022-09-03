@@ -1,4 +1,5 @@
-# Begin Guide Book Plugin work...
+require 'guidebook/version'
+
 begin
     require 'active_record'
     require 'sqlite3'
@@ -147,7 +148,7 @@ module Camping
       end
 
       # Overwrite any settings with directly added app settings.
-      host      = app.options[:host]   ||=  host
+      host      = app.options[:host]      ||=  host
       adapter   = app.options[:adapter]   ||=  adapter
       database  = app.options[:database]  ||=  database
       pool      = app.options[:pool]      ||=  pool
