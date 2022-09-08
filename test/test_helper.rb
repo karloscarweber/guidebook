@@ -92,7 +92,7 @@ module ComandLineCommands
     "test/tmp/#{file}"
   end
 
-  # runs a command on the comand line, in the test directory
+  # runs a command on the command line, in the test directory
   def run_cmd(cmd)
     result = `cd test/tmp && #{cmd} 2>&1`
     raise result unless $?.success?

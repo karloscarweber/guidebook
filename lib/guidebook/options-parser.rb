@@ -25,8 +25,9 @@ module Camping
         case commands[0]
         when "install"
           puts "Install was selected"
-        when "dookie"
-          puts "dropped a dookie"
+          self.create_defaults
+        # when "dookie"
+        #   puts "dropped a dookie"
         when "-v" || "--version"
           puts "Guidebook v#{Camping::GuideBook::VERSION}"
         else
@@ -44,8 +45,39 @@ module Camping
         end
 
         exit
-
       end
+
+      def create_defaults
+        create_db_folder
+        create_migrate_folder
+        create_config_kdl
+      end
+
+      def create_db_folder
+        folder = 'db'
+        Dir.mkdir(folder) unless Dir.exist?(folder)
+      end
+
+      def create_migrate_folder
+        folder = 'db/migrate'
+        Dir.mkdir(folder) unless Dir.exist?(folder)
+      end
+
+      def create_config_kdl
+        file = 'db/config.kdl'
+        File.open(file, 'w') { |f| f.write CONFIG_KDL } unless File.exist?(file)
+      end
+
+      CONFIG_KDL = <<-TXT
+// config.kdl
+
+  database {
+    default adapter="sqlite3" database="db/camping.db" host="localhost" pool=5 timeout=5000
+    development
+    production
+  }
+TXT
+
     end
 
     class Options

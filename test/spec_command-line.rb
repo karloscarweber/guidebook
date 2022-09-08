@@ -2,7 +2,7 @@ require 'test_helper'
 
 ENV["environment"] = "development"
 
-# $:.unshift File.dirname(__FILE__) + '/../../' # I think this will let us see db folder
+# $:.unshift File.dirname(__FILE__) + '/../'
 
 Camping.goes :CommandLine
 
@@ -36,11 +36,39 @@ describe "command line stuff" do
   include ComandLineCommands
 
   before do
-    before_cmd_actions()
-    @test_string = "whatever"
+    @original_dir = Dir.pwd
+    Dir.chdir "test"
+    Dir.mkdir("tmp") unless Dir.exist?("tmp")
+    Dir.chdir "tmp"
   end
 
-  it "should just expect something to be true." do
-    _(@test_string).must_equal "whatever"
+  after do
+    Dir.chdir @original_dir
+    `rm -rf test/tmp` if File.exist?('test/tmp')
   end
+
+  # test install Command
+  it "should install stuff when executed" do
+    `ruby ../../bin/guidebook install`
+    database_folder = Dir.glob("db")
+    _(database_folder.empty?).must_equal false
+    sub_folder = Dir.glob("db/*")
+    _(sub_folder.include?("db/migrate")).must_equal true, "Does not inlcude migrate, #{sub_folder}"
+    _(sub_folder.include?("db/config.kdl")).must_equal true, "Does not inlcude config.kdl, #{sub_folder}"
+  end
+
+  # it "should have added a db folder" do
+  #   `ruby ../../bin/guidebook install`
+  #   database_folder = Dir.glob("db")
+  #   _(database_folder.empty?).must_equal false
+  #   _(File.directory?(database_folder[0])).must_equal true
+  # end
+
+  # it "should have added a config.kdl file" do
+  #   Dir.chdir "tmp/db"
+  #   files = Dir.glob("config.kdl")
+  #   _(files.empty?).must_equal false, "Files was empty: #{files}. All Files: #{Dir.glob("*")}"
+  #   _(File.file?(files[0])).must_equal true
+  # end
+
 end

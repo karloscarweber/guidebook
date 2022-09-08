@@ -12,6 +12,7 @@ bundle add guidebook
 ### Todo
 - [ ] Write a Readme.
 - [ ] Write a generator that adds a db/ folder and a db/ config.kdl
+- [ ] Move the db directory to test, then rewrite the test suite to generate these files.
 - [ ] Test the gem with a greenfield project.
 - [ ] Add an example Camping App using the Extension.
 - [ ] Support database_url, and using environment variables as the database thing.

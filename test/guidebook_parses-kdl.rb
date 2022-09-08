@@ -25,6 +25,12 @@ class ParseKDL::Test < TestCase
     @test_config_1_loc = 'db/test_config_1.yml'
     @test_config_2_loc = 'db/test_config_2.yml'
     @test_config_3_loc = 'db/test_config_3.yml'
+    @original_dir = Dir.pwd
+  end
+
+  def teardown
+    Dir.chdir @original_dir
+    `rm -rf test/tmp` if File.exist?('test/tmp')
   end
 
   # Test that we parsed kdl
