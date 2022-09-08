@@ -2,13 +2,9 @@
 $:.unshift File.dirname(__FILE__) + "/../lib"
 
 require 'guidebook'
+require 'guidebook/version'
 require 'guidebook/options-parser'
 
-#
-# begin
-#   Camping::Server.start
-# rescue OptionParser::ParseError => ex
-#   STDERR.puts "!! #{ex.message}"
-#   puts "** use `#{File.basename($0)} --help` for more details..."
-#   exit 1
-# end
+Camping::GuideBook.parse
+
+exit

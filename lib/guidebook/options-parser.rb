@@ -1,25 +1,89 @@
 require 'irb'
+require 'optparse'
+
+# OptionParser
 
 module Camping
-  class GuideBook
-    class Options
-      if home = ENV['HOME'] # POSIX
-        DB = File.join(home, '.camping.db')
-        RC = File.join(home, '.campingrc')
-      elsif home = ENV['APPDATA'] # MSWIN
-        DB = File.join(home, 'Camping.db')
-        RC = File.join(home, 'Campingrc')
-      else
-        DB = nil
-        RC = nil
+  module GuideBook
+
+    class << self
+      def parse
+        options = Camping::GuideBook::Options.new
+        parse_commands(options)
       end
 
-      HOME = File.expand_path(home) + '/'
+      protected
+
+      def parse_commands(options_object)
+        options = options_object.options
+        parser  = options_object.parser
+        commands = []
+        ARGV.each do |cmd|
+          commands << cmd
+        end
+
+        case commands[0]
+        when "install"
+          puts "Install was selected"
+        when "dookie"
+          puts "dropped a dookie"
+        when "-v" || "--version"
+          puts "Guidebook v#{Camping::GuideBook::VERSION}"
+        else
+          puts options
+          puts parser
+          exit
+        end
+
+        if options[:install] == true
+          puts "install option was selected"
+        end
+
+        if options.has_key? :directory
+          puts "directory option was added: #{options[:directory]}"
+        end
+
+        exit
+
+      end
+    end
+
+    class Options
+
+      # initalizing an Options object grabs the ARGV arguments
+      def initialize()
+        parse!(ARGV)
+      end
+
+      def options
+        @options
+      end
+
+      def parser
+        @parser
+      end
+
+      # if home = ENV['HOME'] # POSIX
+      #   DB = File.join(home, '.camping.db')
+      #   RC = File.join(home, '.campingrc')
+      # elsif home = ENV['APPDATA'] # MSWIN
+      #   DB = File.join(home, 'Camping.db')
+      #   RC = File.join(home, 'Campingrc')
+      # else
+      #   DB = nil
+      #   RC = nil
+      # end
+
+      # HOME = File.expand_path(home) + '/'
+
+      protected
 
       def parse!(args)
         args = args.dup
 
-        options = {}
+        @options = {}
+        @options[:version] = false
+
 
         opt_parser = OptionParser.new("", 24, '  ') do |opts|
           opts.banner = "Usage: guidebook [command] [options]"
@@ -29,18 +93,23 @@ module Camping
 
           # opts.on("-a", "--add",
           # "Adds a db folder with a migrate folder inside") { |v| options[:Host] = v }
-          opts.on("-i", "install",
-          "Installs Guidebook, With default database settings. Adds actions to your Rakefile, ads a config.kdl in your db directory.") {|v| options[:install] = true}
+          opts.on("-i", "--install",
+          "Installs Guidebook, With default database settings. Adds actions to your Rakefile, ads a config.kdl in your db directory.") {|v| @options[:install] = true}
+
+          opts.on("-d", "--directory [DIRECTORY_NAME]", "changes the installation directory of your database stuff") { |v| @options[:directory] = v }
+
+          opts.on("-v", "--version", "displays the current Guidebook version") { |v| @options[:version] = true }
 
           # No argument, shows at tail.  This will print an options summary.
           # Try it and see!
-          opts.on("-h", "--help", "Show this message") do
+          opts.on_tail("-h", "--help", "Show this message") do
             puts opts
             exit
           end
-        end
 
+        end
         opt_parser.parse!(args)
+        @parser = opt_parser
       end
 
     end
