@@ -24,48 +24,57 @@ module Camping
 
         case commands[0]
         when "install"
-          puts "Install was selected"
-          self.create_defaults
-        # when "dookie"
-        #   puts "dropped a dookie"
+          self.create_defaults options
         when "-v" || "--version"
           puts "Guidebook v#{Camping::GuideBook::VERSION}"
           exit
         else
-          # puts options
           puts parser
           exit
-        end
-
-        if options[:install] == true
-          puts "install option was selected"
-        end
-
-        if options.has_key? :directory
-          puts "directory option was added: #{options[:directory]}"
         end
 
         exit
       end
 
-      def create_defaults
-        create_db_folder
-        create_migrate_folder
-        create_config_kdl
+      # Create Defaults:
+      # Creates, if not present, the following:
+      #   a db/ folder
+      #   a db/config.kdl file with default settings
+      #   a db/migrate folder.
+      #
+      # Also appends the Cairn bindings for Active Record migrations via Rake.
+      # Cairn is just a wrapper for standalone-migrations, so they should all
+      # be the same.
+      def create_defaults(options)
+
+        dir = "db"
+
+        # This option will change the install directory of the database stuff.
+        # The rest of guidebook doesn't know how to find it so this is kinda
+        # pointless at the moment.
+        if options.has_key? :directory
+          puts "directory option was added: #{options[:directory]}"
+          dir = options[:directory]
+        end
+
+        create_db_folder(dir)
+        create_migrate_folder(dir)
+        create_config_kdl(dir)
       end
 
-      def create_db_folder
-        folder = 'db'
+      def create_db_folder(dir)
+        folder = "#{dir}"
         Dir.mkdir(folder) unless Dir.exist?(folder)
       end
 
-      def create_migrate_folder
-        folder = 'db/migrate'
+      def create_migrate_folder(dir)
+        folder = "#{dir}/migrate"
         Dir.mkdir(folder) unless Dir.exist?(folder)
       end
 
-      def create_config_kdl
-        file = 'db/config.kdl'
+      def create_config_kdl(dir)
+        file = "#{dir}/config.kdl"
+        CONFIG_KDL["ddddddd"] = dir
         File.open(file, 'w') { |f| f.write CONFIG_KDL } unless File.exist?(file)
       end
 
@@ -73,7 +82,7 @@ module Camping
 // config.kdl
 
   database {
-    default adapter="sqlite3" database="db/camping.db" host="localhost" pool=5 timeout=5000
+    default adapter="sqlite3" database="ddddddd/camping.db" host="localhost" pool=5 timeout=5000
     development
     production
   }
@@ -116,7 +125,6 @@ TXT
 
         @options = {}
         @options[:version] = false
-
 
         opt_parser = OptionParser.new("", 24, '  ') do |opts|
           opts.banner = "Usage: guidebook [command] [options]"
