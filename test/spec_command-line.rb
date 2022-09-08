@@ -57,12 +57,9 @@ describe "command line stuff" do
     _(sub_folder.include?("db/config.kdl")).must_equal true, "Does not inlcude config.kdl, #{sub_folder}"
   end
 
-  # it "should have added a db folder" do
-  #   `ruby ../../bin/guidebook install`
-  #   database_folder = Dir.glob("db")
-  #   _(database_folder.empty?).must_equal false
-  #   _(File.directory?(database_folder[0])).must_equal true
-  # end
+  it "should show the version" do
+    _(run_cmd("ruby ../../bin/guidebook -v")).must_equal "Guidebook v#{Camping::GuideBook::VERSION}\n"
+  end
 
   # it "should have added a config.kdl file" do
   #   Dir.chdir "tmp/db"

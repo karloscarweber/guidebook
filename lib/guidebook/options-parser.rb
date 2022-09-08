@@ -30,8 +30,9 @@ module Camping
         #   puts "dropped a dookie"
         when "-v" || "--version"
           puts "Guidebook v#{Camping::GuideBook::VERSION}"
+          exit
         else
-          puts options
+          # puts options
           puts parser
           exit
         end

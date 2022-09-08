@@ -134,4 +134,12 @@ production:
   database: db/production.sql
     TXT
   end
+
+  # runs a command
+  def run_cmd(cmd)
+    result = `#{cmd} 2>&1`
+    raise result unless $?.success?
+    result
+  end
+
 end
