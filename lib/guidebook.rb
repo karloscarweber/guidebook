@@ -31,13 +31,33 @@ module Camping
       end
     end
 
+    module ClassMethods
+      def establish_connection
+
+        # puts "establish_connection from: #{Dir.pwd}"
+        #
+        # puts "database locaiton at connection site: #{}"
+
+        if self.options.has_key? :database_settings
+          self.options[:database_settings] => { adapter:, database:, host:, pool: }
+
+          self::Models::Base.establish_connection(
+            :adapter => adapter,
+            :database => database,
+            :host => host,
+            :pool => pool
+          )
+        end
+      end
+    end
+
     # this is the private settings for database defaults.
     def self.db_defaults
     {
       default: {
         host:  'localhost',
         adapter:  'sqlite3',
-        database:  'db/camping.db',
+        database:  "db/camping.db",
         pool:  5
       }
     }
@@ -49,10 +69,10 @@ module Camping
       # Puts the Base Class into your apps' Models module.
       app::Models.module_eval $AR_TO_BASE
 
-      stored_config = self.get_config # Grab settings in db/config.kdl
+      # stored_config = self.get_config # Grab settings in db/config.kdl
 
       # Expects an array, hence parallel assignment. Should probably always get one too.
-      config_dict = self.squash_settings(app, stored_config)
+      config_dict = self.squash_settings(app)
       host, adapter, database, pool = config_dict[:collapsed_config]
 
       # does that generatin action!
@@ -63,16 +83,29 @@ module Camping
       # app.set :database, database
       # app.set :host, host
       # app.set :pool, pool
+#
+#       puts "Establishing connection at: #{database}. current pwd: #{Dir.pwd}"
+#       if (database[0]+database[1]) == 'db'
+#         database = Dir.pwd() + '/' + database
+#       end
+
+        # store the app settings.
+        app.set(:database_settings, {
+          :adapter => adapter,
+          :database => database,
+          :host => host,
+          :pool => pool
+        })
 
       # Establishes the database connection.
       # Because we're doing all of this in the setup method
       # The connection will take place when this gear is packed.
-      app::Models::Base.establish_connection(
-        :adapter => adapter,
-        :database => database,
-        :host => host,
-        :pool => pool
-      )
+      # app::Models::Base.establish_connection(
+      #   :adapter => adapter,
+      #   :database => database,
+      #   :host => host,
+      #   :pool => pool
+      # )
       # Interesting side effect. If we pack this gear into more than one app,
       # Then each app will have a database connection to manage.
     end
@@ -111,10 +144,10 @@ module Camping
 
     # squash settings basically collapses all the settings that we have into something
     # truly beautiful.
-    def self.squash_settings(app, config)
+    def self.squash_settings(app)
       defaults = self.db_defaults
 
-      stored_config = config
+      stored_config = self.get_config
       environment = ENV['environment'] ||= "development"
 
       # The defaults are all for local hosting.
@@ -196,13 +229,23 @@ module Camping
     # an optional silence_warnings parameter is set to false. This is used for
     # testing.
     def self.parse_kdl(config_file = nil, silence_warnings = false)
-      kdl_string = File.open(config_file).read
+      # kdl_string = File.open(config_file).read
+      begin
+        kdl_string = File.open(config_file).read
+      rescue => error # Errno::ENOENT
+        puts ""
+        puts "Error trying to read a config file: \"#{error}.\""
+        puts "  Current directory: #{Dir.pwd}"
+        puts "  files in directory: #{Dir.glob('*')}"
+        puts ""
+      end
 
       begin
         kdl_doc = KDL.parse_document(kdl_string)
       rescue => error
+        warn "#{error}"
         # parse error message to get line number and column:
-        message = Camping::GuideBook.kdl_error_message(kdl_string, error.message)
+        message = Camping::GuideBook.kdl_error_message(kdl_string, error.message, error)
         m = error.message.match( /\((\d)+:(\d)\)/ )
         line, column = m[1].to_i, m[2].to_i
 
@@ -219,6 +262,7 @@ module Camping
     def self.get_config_file(search_pattern = "**/db/*.kdl")
       # get file location,
       files = Dir.glob(search_pattern)
+
       config_file = nil
       # try to get the config_file for db.
       files.each do |file|
@@ -270,6 +314,8 @@ module Camping
         yaml_string <<  "  timeout: #{conf[:timeout]}\n"   if conf.has_key? :timeout
       }
 
+      # if config.class
+
       if config.has_key? :default
         add_row.(yaml_string, config[:default], "default")
       end
@@ -282,10 +328,13 @@ module Camping
         add_row.(yaml_string, config[:production], "production")
       end
 
-      # write the thing.
-      File.open(write_location, 'w') { |file|
-        file.write(yaml_string)
-      }
+      # a bit of housekeeping for writing to the directory.
+      file = write_location
+
+      raise "cannot write nil" unless file
+      folder = File.dirname(file)
+      `mkdir -p #{folder}` unless File.exist?(folder)
+      File.open(file, 'w') { |f| f.write yaml_string } unless yaml_string.length == 0
     end
 
   end

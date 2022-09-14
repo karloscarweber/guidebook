@@ -78,6 +78,9 @@ module Camping
         File.open(file, 'w') { |f| f.write CONFIG_KDL } unless File.exist?(file)
       end
 
+      def generate_yaml(dir)
+      end
+
       CONFIG_KDL = <<-TXT
 // config.kdl
 
@@ -86,6 +89,17 @@ module Camping
     development
     production
   }
+TXT
+      DEFAULT_YAML = <<-TXT
+development:
+  adapter: sqlite3
+  database: db/development.sql
+test:
+  adapter: sqlite3
+  database: db/test.sql
+production:
+  adapter: sqlite3
+  database: db/production.sql
 TXT
 
     end

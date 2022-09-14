@@ -1,7 +1,0 @@
-// config.kdl
-
-  database {
-    default adapter="sqlite3" database="db/camping.db" host="localhost" pool=5 timeout=5000
-    development
-    production adapter="postgres" database="kow"
-  }

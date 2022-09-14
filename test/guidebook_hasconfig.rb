@@ -1,34 +1,37 @@
 require 'test_helper'
 
 begin
+
   ENV["environment"] = "development"
 
-  # $:.unshift File.dirname(__FILE__) + '/../../' # I think this will let us see db folder
+  $:.unshift File.dirname(__FILE__) + '../../'
 
-  Camping.goes :HasConfig
-
-  module HasConfig
-
-    # host      = app.options[:host]      ||=  host
-    # adapter   = app.options[:adapter]   ||=  adapter
-    # database  = app.options[:database]  ||=  database
-    # pool      = app.options[:pool]      ||=  pool
-
-    set :host, "outerspace"
-
-    pack Camping::GuideBook
-  end
-  module HasConfig
-    module Models
-      class Page < Base; end
-    end
-  end
-
-  class HasConfig::Test < TestCase
+  class TestHasConfig < MiniTest::Test
+    include TestCaseReloader
+    include CommandLineCommands
+    BASE = File.expand_path('../apps/hasconfig', __FILE__)
+    def file; BASE + '.rb' end
 
     def setup
+      set_name :HasConfig
+      move_to_tmp()
+      write_rakefile()
+
+      # the Camping reloader runs from the root for some reason,
+      # so when we reload a camping app we need to give it the current
+      # test/tmp directory as the location of the database, otherwise
+      # we'll create databases in the root of Guidebook which is not
+      # what we want.
+      db_loc = Dir.pwd
+      write_good_kdl(db_loc)
+      super
       @configs = Camping::GuideBook.get_config
       @options = HasConfig.options
+    end
+
+    def teardown
+      leave_tmp()
+      super
     end
 
     # expect it to have the correct settings.
@@ -47,29 +50,36 @@ begin
     # found in db/config.kdl instead of any deeper kdl file.
     def test_can_find_config_file
       config_file = Camping::GuideBook.get_config_file
-      assert_equal "db/config.kdl", config_file, "The config file was not found. #{config_file}"
+      assert_equal "db/config.kdl", config_file, "The config file was not found #{config_file}"
     end
 
     # Next find the root config file when provided with a search pattern
     def test_can_find_config_file_when_provided_with_search_pattern
       config_file = Camping::GuideBook.get_config_file "db/*.kdl"
-      assert_equal "db/config.kdl", config_file, "The config file was not found. #{config_file}"
+      assert_equal "db/config.kdl", config_file, "The config file was not found #{config_file}"
     end
 
     # Next find the root config file.
     def test_can_find_config_file_when_provided_with_test_search_pattern
-      config_file = Camping::GuideBook.get_config_file "test/**/db/*.kdl"
-      assert_equal "test/apps/db/config.kdl", config_file, "The config file was not found. #{config_file}"
+      config_file = Camping::GuideBook.get_config_file "db/*.kdl"
+      assert_equal "db/config.kdl", config_file, "The config file was not found. #{config_file}"
     end
 
     # tests if we can override the default settings in the Camping Startup.
-    # def test_can_override_setttings
-    #   HasConfig.set :database, "database_url"
-    #   HasConfig.pack Camping::GuideBook
-    #   assert_equal false, HasConfig.options['database'], "Test not written yet."
-    # end
+    def test_can_override_setttings
+      HasConfig.set :database, "database_url"
+      HasConfig.pack Camping::GuideBook
+
+      assert_equal 'database_url', HasConfig.options[:database], "Settings were not overwritten in the module definition as expectd."
+
+      assert_equal 'outerspace', HasConfig.options[:host], "Settings were not overwritten in the module definition as expectd."
+    end
 
   end
-rescue
-  warn "Skipping Has Config tests"
+rescue => error
+  warn ""
+  warn "# Skipping Has Config tests"
+  warn ""
+  warn error
+  warn ""
 end

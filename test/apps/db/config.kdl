@@ -1,8 +1,0 @@
-// config.kdl
-
-  database {
-    // default adapter="postgres" database="test_database" host="faraway_from_here" pool=5 timeout=5000
-    default adapter="sqlite3" database="db/camping.db" host="localhost" pool=5 timeout=5000
-    development // database="postgres://fhjslkfguioewqyftgl:569876087896574f58vbfndas7.build5.example.com:5432/6b0yofuhd" // Doesn't support database URLs yet.
-    production adapter="postgres" database="superdatabase"
-  }

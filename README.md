@@ -7,20 +7,18 @@ Install using bundler:
 bundle add guidebook
 ```
 
-
-
 ### Todo
+- [x] Move the db directory to test, then rewrite the test suite to generate these files.
 - [ ] Write a Readme.
-- [ ] Write a generator that adds a db/ folder and a db/ config.kdl
-- [ ] Move the db directory to test, then rewrite the test suite to generate these files.
+- [x] Write a generator that adds a db/ folder and a db/ config.kdl
 - [ ] Test the gem with a greenfield project.
 - [ ] Add an example Camping App using the Extension.
 - [ ] Support database_url, and using environment variables as the database thing.
 - [ ] Finish work on Camping 3.0 so that this gem can be used like legit.
 - [ ] Map Generators to rake somehow too.
 - [ ] Write some guides on how to use Active Record.
-- [ ] Write tests with Rake.
-- [ ] Also test using Rake.
+- [x] Write tests with Rake.
+- [x] Also test using Rake.
 - [ ] Map migration commands to Rake automatically somehow.
 - [ ] Test Migrations across multiple databases.
 - [ ] Add copyright thing.

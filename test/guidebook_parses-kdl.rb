@@ -2,22 +2,20 @@ require 'test_helper'
 
 ENV["environment"] = "development"
 
-$:.unshift File.dirname(__FILE__) + '/../../' # I think this will let us see db folder
-
-Camping.goes :ParseKDL
+$:.unshift File.dirname(__FILE__) + '../../'
 
 module ParseKDL
-  pack Camping::GuideBook
-end
-module ParseKDL
-  module Models
-    class Page < Base; end
-  end
 end
 
 class ParseKDL::Test < TestCase
+  include CommandLineCommands
 
   def setup
+    move_to_tmp()
+
+    write_good_kdl
+    write_bad_kdl
+
     @kdl = Camping::GuideBook.parse_kdl("db/config.kdl")
     @test_config_1 = {default: {database: "kow"}}
     @test_config_2 = {default: {database: "db/camping.db", host: "localhost", adapter: "sqlite3"}}
@@ -25,12 +23,10 @@ class ParseKDL::Test < TestCase
     @test_config_1_loc = 'db/test_config_1.yml'
     @test_config_2_loc = 'db/test_config_2.yml'
     @test_config_3_loc = 'db/test_config_3.yml'
-    @original_dir = Dir.pwd
   end
 
   def teardown
-    Dir.chdir @original_dir
-    `rm -rf test/tmp` if File.exist?('test/tmp')
+    leave_tmp()
   end
 
   # Test that we parsed kdl
@@ -42,11 +38,11 @@ class ParseKDL::Test < TestCase
     Camping::GuideBook.parse_kdl("db/bad.kdl", true)
     last_warning = Camping::GuideBook::WARNINGS.last
     test_string = <<-RUBY
-\n3:     default adapter="sqlite3" database="db/camping.db" host="localhost" pool=5 timeout=5000
-4:     development
-5:     production adapter="postgres" database="kow"
-6:   }
-7:\s
+\n2:   default adapter="sqlite3" database="db/camping.db" host="localhost" pool=5 timeout=5000
+3:   development
+4:   production adapter="postgres" database="kow"
+5: }
+6:\s
 RUBY
     assert_equal test_string, last_warning, "Error messages written are not what we expected."
   end
@@ -68,6 +64,20 @@ RUBY
     assert settings[:development].empty?, "Development settings were supposed to be empty. WTF!"
     assert_equal 'postgres', settings[:production][:adapter], "Adapter wrong unmerged settings."
     assert_equal 'kow', settings[:production][:database], "Database wrong unmerged settings."
+  end
+
+  def test_that_we_generate_the_main_yaml_from_kdl
+
+    app = Tent.new
+
+    config_dict = Camping::GuideBook.squash_settings(app)
+    host, adapter, database, pool = config_dict[:collapsed_config]
+
+    length = Camping::GuideBook.generate_config_yml(config_dict[:stored_config], 'db/config.yml')
+    assert_equal 433, length, "Yammy is not the same"
+
+    splitted = File.open('db/config.yml').read.split("\n")
+    assert_equal "  adapter: sqlite3", splitted[6], "The Generated YAML for test_config_1 doesn't have the right data. Not Ok."
   end
 
   def test_that_we_generate_the_right_yaml

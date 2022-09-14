@@ -3,9 +3,19 @@ module Camping
 
     WARNINGS = []
 
-    def self.kdl_error_message(kdl_string="",error_message="" )
+    def self.kdl_error_message(kdl_string="",error_message="", error=nil)
       # parse error message to get line number and column:
       m = error_message.match( /\((\d)+:(\d)\)/ )
+
+      if m == nil
+        warn "kdl_error_message was called on a nil error message?"
+        warn "message: #{error_message}"
+        warn "kdl_string: #{kdl_string}"
+        warn "current dir: #{Dir.pwd}"
+        warn "#{error}"
+        return
+      end
+
       line = m[1].to_i
       lines = kdl_string.split( "\n" )
 
