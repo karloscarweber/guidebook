@@ -307,8 +307,6 @@ module Camping
         yaml_string <<  "  timeout: #{conf[:timeout]}\n"   if conf.has_key? :timeout
       }
 
-      # if config.class
-
       if config.has_key? :default
         add_row.(yaml_string, config[:default], "default")
       end
