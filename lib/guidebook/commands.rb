@@ -1,8 +1,6 @@
 require 'irb'
 require 'optparse'
 
-# OptionParser
-
 module Camping
   module GuideBook
 
@@ -102,7 +100,6 @@ rescue LoadError => e
   puts "gem install cairn to get db:migrate:* tasks! (Error: \#{e})"
 end
 TXT
-
     end
 
     class Options
@@ -119,19 +116,6 @@ TXT
       def parser
         @parser
       end
-
-      # if home = ENV['HOME'] # POSIX
-      #   DB = File.join(home, '.camping.db')
-      #   RC = File.join(home, '.campingrc')
-      # elsif home = ENV['APPDATA'] # MSWIN
-      #   DB = File.join(home, 'Camping.db')
-      #   RC = File.join(home, 'Campingrc')
-      # else
-      #   DB = nil
-      #   RC = nil
-      # end
-
-      # HOME = File.expand_path(home) + '/'
 
       protected
 

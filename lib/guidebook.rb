@@ -69,35 +69,25 @@ module Camping
       # Puts the Base Class into your apps' Models module.
       app::Models.module_eval $AR_TO_BASE
 
-      # stored_config = self.get_config # Grab settings in db/config.kdl
-
       # Expects an array, hence parallel assignment. Should probably always get one too.
-      config_dict = self.squash_settings(app)
-      host, adapter, database, pool = config_dict[:collapsed_config]
+      self.squash_settings(app) => {
+        collapsed_config:,
+        stored_config:
+      }
+      host, adapter, database, pool = collapsed_config
 
       # does that generatin action!
-      generate_config_yml(config_dict[:stored_config])
+      generate_config_yml(stored_config)
 
-      # store the squashed options into the app as options
-      # app.set :adapter, adapter
-      # app.set :database, database
-      # app.set :host, host
-      # app.set :pool, pool
-#
-#       puts "Establishing connection at: #{database}. current pwd: #{Dir.pwd}"
-#       if (database[0]+database[1]) == 'db'
-#         database = Dir.pwd() + '/' + database
-#       end
+      # store the database settings into the app.
+      app.set(:database_settings, {
+        :adapter => adapter,
+        :database => database,
+        :host => host,
+        :pool => pool
+      })
 
-        # store the app settings.
-        app.set(:database_settings, {
-          :adapter => adapter,
-          :database => database,
-          :host => host,
-          :pool => pool
-        })
-
-      # Establishes the database connection.
+      # how to Establishe the database connection.
       # Because we're doing all of this in the setup method
       # The connection will take place when this gear is packed.
       # app::Models::Base.establish_connection(
@@ -108,6 +98,9 @@ module Camping
       # )
       # Interesting side effect. If we pack this gear into more than one app,
       # Then each app will have a database connection to manage.
+      #
+      # guidebook adds an establish_connection method to your app that is
+      # automatically called when your app is first accessed by the server.
     end
 
     # #get_config
