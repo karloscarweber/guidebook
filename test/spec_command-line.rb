@@ -36,7 +36,7 @@ describe "command line stuff" do
     sub_folder = Dir.glob("db/*")
     _(sub_folder.include?("db/migrate")).must_equal true, "Does not inlcude migrate, #{sub_folder}"
     _(sub_folder.include?("db/config.kdl")).must_equal true, "Does not inlcude config.kdl, #{sub_folder}"
-    # check to see if a rake file, found in tmp in this instance, includes an additional rake command that we add.
+    _(Dir.glob("*").include?('Rakefile')).must_equal true, "Does not inlcude config.kdl, Rakefile"
   end
 
   it "should show the version" do
@@ -47,6 +47,13 @@ describe "command line stuff" do
     run_cmd("ruby ../../bin/guidebook install -d campcamp")
     database_folder = Dir.glob("campcamp")
     _(database_folder.empty?).must_equal false
+  end
+
+  it "should append database details to the rakefile" do
+    run_cmd("ruby ../../bin/guidebook install")
+    splitted = File.open('Rakefile').read.split("\n")
+    assert_equal '  require "cairn"', splitted[3], "This is the wrong stuff appended to Rakefile."
+    assert_equal '  StandaloneMigrations::Tasks.load_tasks', splitted[4], "This is the wrong stuff appended to Rakefile."
   end
 
 end

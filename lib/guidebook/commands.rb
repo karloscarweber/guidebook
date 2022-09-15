@@ -60,6 +60,7 @@ module Camping
         create_db_folder(dir)
         create_migrate_folder(dir)
         create_config_kdl(dir)
+        add_commands_to_rakefile()
       end
 
       def create_db_folder(dir)
@@ -78,7 +79,8 @@ module Camping
         File.open(file, 'w') { |f| f.write CONFIG_KDL } unless File.exist?(file)
       end
 
-      def generate_yaml(dir)
+      def add_commands_to_rakefile()
+        File.open('Rakefile', 'a') { |f| f.write("\n#{RAKEFILE_APPENDS}") }
       end
 
       CONFIG_KDL = <<-TXT
@@ -90,16 +92,15 @@ module Camping
     production
   }
 TXT
-      DEFAULT_YAML = <<-TXT
-development:
-  adapter: sqlite3
-  database: db/development.sql
-test:
-  adapter: sqlite3
-  database: db/test.sql
-production:
-  adapter: sqlite3
-  database: db/production.sql
+
+        RAKEFILE_APPENDS = <<-TXT
+# Add database migrations to your Rakefile.
+begin
+  require "cairn"
+  StandaloneMigrations::Tasks.load_tasks
+rescue LoadError => e
+  puts "gem install cairn to get db:migrate:* tasks! (Error: \#{e})"
+end
 TXT
 
     end

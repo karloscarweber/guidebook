@@ -7,19 +7,29 @@ Install using bundler:
 bundle add guidebook
 ```
 
+Guidebook should now be added as a Gemfile dependency and gem installed. So you can navigate to your Camping app and install it there too. Run this in your shell:
+```bash
+guidebook install
+```
+
+This will generate a `db/` directory, along with a `db/config.kdl`, and a `db/migrate` folder for your migrations. If you have a Rakefile, it will append Code to install database commands to your Rakefile.
+
+
+## Creating a database
+
+## Making a new migration
+
+## Running your migration
+
+## Rolling back a migration
+
+
 ### Todo
-- [x] Move the db directory to test, then rewrite the test suite to generate these files.
 - [ ] Write a Readme.
-- [x] Write a generator that adds a db/ folder and a db/ config.kdl
-- [ ] Test the gem with a greenfield project.
 - [ ] Add an example Camping App using the Extension.
 - [ ] Support database_url, and using environment variables as the database thing.
 - [ ] Finish work on Camping 3.0 so that this gem can be used like legit.
-- [ ] Map Generators to rake somehow too.
 - [ ] Write some guides on how to use Active Record.
-- [x] Write tests with Rake.
-- [x] Also test using Rake.
-- [ ] Map migration commands to Rake automatically somehow.
 - [ ] Test Migrations across multiple databases.
 - [ ] Add copyright thing.
 
@@ -32,8 +42,10 @@ bundle add guidebook
 - [x] Have a setting where a database connection string is grabbed by default
 - [x] Test that settings added using #set on the Camping app take precedence.
 - [x] Generate config.yml for the rake tasks stuff thing. It expects it.
-
-### Notes:
-It would be cool If we could map Active Record generators to rake tasks automatically from Plugins.
-
-Camping needs a place to mount Command line arguments automagically. migrations is something that needs to be universal and good and stuff.
+- [x] Write tests with Rake.
+- [x] Also test using Rake.
+- [x] Write a generator that adds a db/ folder and a db/ config.kdl
+- [x] Test the gem with a greenfield project.
+- [x] Move the db directory to test, then rewrite the test suite to generate these files.
+- [x] Map migration commands to Rake automatically somehow.
+- [x] Map Generators to rake somehow too.
