@@ -16,4 +16,8 @@ module Doesqueries
   module Models
     class Page < Base; end
   end
+
+  def self.create
+    establish_connection()
+  end
 end

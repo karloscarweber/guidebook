@@ -1,34 +1,34 @@
 GIT
   remote: https://github.com/karloscarweber/camping
-  revision: 1e760ef8fe4cb5c3ee2b9988efee2c8820e17641
+  revision: d3471678e098f57cd93791e2e38770231b4bc089
   branch: camping-3
   specs:
-    camping (2.3.639)
+    camping (2.3.650)
       mab (>= 0.0.3)
       rack (>= 1.0)
 
 GEM
   remote: https://rubygems.org/
   specs:
-    actionpack (7.0.3.1)
-      actionview (= 7.0.3.1)
-      activesupport (= 7.0.3.1)
+    actionpack (7.0.4)
+      actionview (= 7.0.4)
+      activesupport (= 7.0.4)
       rack (~> 2.0, >= 2.2.0)
       rack-test (>= 0.6.3)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.0, >= 1.2.0)
-    actionview (7.0.3.1)
-      activesupport (= 7.0.3.1)
+    actionview (7.0.4)
+      activesupport (= 7.0.4)
       builder (~> 3.1)
       erubi (~> 1.4)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.1, >= 1.2.0)
-    activemodel (7.0.3.1)
-      activesupport (= 7.0.3.1)
-    activerecord (7.0.3.1)
-      activemodel (= 7.0.3.1)
-      activesupport (= 7.0.3.1)
-    activesupport (7.0.3.1)
+    activemodel (7.0.4)
+      activesupport (= 7.0.4)
+    activerecord (7.0.4)
+      activemodel (= 7.0.4)
+      activesupport (= 7.0.4)
+    activesupport (7.0.4)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (>= 1.6, < 2)
       minitest (>= 5.1)
@@ -46,7 +46,7 @@ GEM
       concurrent-ruby (~> 1.0)
     kdl (1.0.3)
       simpleidn (~> 0.2.1)
-    loofah (2.18.0)
+    loofah (2.19.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
     mab (0.0.3)
@@ -60,6 +60,8 @@ GEM
     nio4r (2.5.8)
     nokogiri (1.13.8-arm64-darwin)
       racc (~> 1.4)
+    nokogiri (1.13.8-x86_64-darwin)
+      racc (~> 1.4)
     puma (5.6.5)
       nio4r (~> 2.0)
     racc (1.6.0)
@@ -71,9 +73,9 @@ GEM
       nokogiri (>= 1.6)
     rails-html-sanitizer (1.4.3)
       loofah (~> 2.3)
-    railties (7.0.3.1)
-      actionpack (= 7.0.3.1)
-      activesupport (= 7.0.3.1)
+    railties (7.0.4)
+      actionpack (= 7.0.4)
+      activesupport (= 7.0.4)
       method_source
       rake (>= 12.2)
       thor (~> 1.0)
@@ -82,7 +84,8 @@ GEM
     ruby-progressbar (1.11.0)
     simpleidn (0.2.1)
       unf (~> 0.1.4)
-    sqlite3 (1.4.4)
+    sqlite3 (1.5.2-arm64-darwin)
+    sqlite3 (1.5.2-x86_64-darwin)
     thor (1.2.1)
     tilt (2.0.11)
     tzinfo (2.0.5)
@@ -90,12 +93,14 @@ GEM
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.8.2)
-    zeitwerk (2.6.0)
+    zeitwerk (2.6.1)
 
 PLATFORMS
   arm64-darwin-21
+  x86_64-darwin-20
 
 DEPENDENCIES
+  activerecord (~> 7.0.4)
   cairn (~> 7.1.1)
   camping!
   kdl

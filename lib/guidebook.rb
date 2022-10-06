@@ -3,11 +3,26 @@ require 'guidebook/version'
 
 begin
     require 'active_record'
-    require 'sqlite3'
-    require 'cairn'
-    require 'kdl'
 rescue LoadError => e
-    raise MissingLibrary, "ActiveRecord could not be loaded (is it installed?): #{e.message}"
+    raise "ActiveRecord could not be loaded (is it installed?): #{e.message}"
+end
+
+begin
+  require 'sqlite3'
+rescue LoadError => e
+  raise "sqlite3 could not be loaded (is it installed?): #{e.message}"
+end
+
+begin
+  require 'cairn'
+rescue LoadError => e
+  raise "cairn could not be loaded (is it installed?): #{e.message}"
+end
+
+begin
+  require 'kdl'
+rescue LoadError => e
+  raise "kdl could not be loaded (is it installed?): #{e.message}"
 end
 
 $AR_TO_BASE = <<-RUBY

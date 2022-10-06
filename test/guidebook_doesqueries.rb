@@ -26,8 +26,6 @@ begin
       write_good_kdl(db_loc)
       super
       run_make_db()
-      # manually establishing a connection
-      Doesqueries.establish_connection
     end
 
     def teardown

@@ -14,8 +14,47 @@ guidebook install
 
 This will generate a `db/` directory, along with a `db/config.kdl`, and a `db/migrate` folder for your migrations. If you have a Rakefile, it will append Code to install database commands to your Rakefile.
 
+You'll need to pack guidebook to get it working in your app:
+
+```ruby
+require 'camping'
+require 'guidebook'
+
+Camping.goes :MyApp
+
+module MyApp
+  pack Camping::GuideBook
+
+  module Models
+    class Page < Base; end
+  end
+
+  # you'll need to connect to your database in the #create method
+  def self.create
+    establish_connection()
+  end
+end
+```
 
 ## Creating a database
+
+## Connecting to your databse
+When you pack `guidebook` into your camping app, guidebook adds an `#establish_connection` method to your camping app. Call this in your `#create` method to connect to your database.
+
+```ruby
+module MyApp
+  module Models class Page < Base; end  end
+
+  def self.create
+    establish_connection()
+  end
+end
+```
+
+## Running some queries.
+
+Just do it!
+
 
 ## Making a new migration
 
@@ -24,13 +63,13 @@ This will generate a `db/` directory, along with a `db/config.kdl`, and a `db/mi
 ## Rolling back a migration
 
 
+
 ### Todo
+- [ ] Support database_url, and using environment variables as the database thing.
 - [ ] Write a Readme.
 - [ ] Add an example Camping App using the Extension.
-- [ ] Support database_url, and using environment variables as the database thing.
 - [ ] Finish work on Camping 3.0 so that this gem can be used like legit.
 - [ ] Write some guides on how to use Active Record.
-- [ ] Test Migrations across multiple databases.
 - [ ] Add copyright thing.
 
 ### Done

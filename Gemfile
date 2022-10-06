@@ -2,6 +2,7 @@ source 'https://rubygems.org'
 
 gem 'cairn',  '~> 7.1.1'
 # we don't have activerecord as a dependency as cairn takes care of that.
+gem 'activerecord',  '~> 7.0.4'
 gem 'sqlite3'
 gem 'rake', '>= 10.0'
 gem 'kdl'
