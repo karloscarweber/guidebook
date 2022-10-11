@@ -52,8 +52,9 @@ describe "command line stuff" do
   it "should append database details to the rakefile" do
     run_cmd("ruby ../../bin/guidebook install")
     splitted = File.open('Rakefile').read.split("\n")
-    assert_equal '  require "cairn"', splitted[3], "This is the wrong stuff appended to Rakefile."
-    assert_equal '  StandaloneMigrations::Tasks.load_tasks', splitted[4], "This is the wrong stuff appended to Rakefile."
+    assert_equal '  require "cairn"', splitted[-6], "This is the wrong stuff appended to Rakefile."
+    assert_equal '  require "guidebook"', splitted[-5], "This is the wrong stuff appended to Rakefile."
+    assert_equal '  StandaloneMigrations::Tasks.load_tasks', splitted[-4], "This is the wrong stuff appended to Rakefile."
   end
 
 end

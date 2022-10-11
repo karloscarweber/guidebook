@@ -83,58 +83,70 @@ module Camping
       end
 
       def add_commands_to_rakefile()
-        File.open('Rakefile', 'a') { |f| f.write("\n#{RAKEFILE_APPENDS}") }
+        File.open('Rakefile', 'w') { |f| f.write RAKEFILE } unless File.exist?('Rakefile')
+        write = false
+        File.open('Rakefile', 'r') { |f|
+          the_file =  f.read
+          write = true if the_file.include?('require "cairn"') && the_file.include?('require "guidebook"') && the_file.include?('StandaloneMigrations::Tasks.load_tasks')
+        }
+        File.open('Rakefile', 'a') { |f| f.write("\n#{RAKEFILE_APPENDS }") } unless write == true
       end
 
-      CONFIG_KDL = <<-TXT
-// config.kdl
+      CONFIG_KDL = <<~TXT
+        // config.kdl
 
-  database {
-    default adapter="sqlite3" database="ddddddd/camping.db" host="localhost" pool=5 timeout=5000
-    development
-    production
-  }
-TXT
+        database {
+          default adapter="sqlite3" database="ddddddd/camping.db" host="localhost" pool=5 timeout=5000
+          development
+          production
+        }
+      TXT
 
-      CONFIG_YML = <<-TXT
-# db/config.yml
+      CONFIG_YML = <<~TXT
+        # db/config.yml
 
-  # This is a generated File. Do not directly alter this file and expect any changes.
-  # Modify db/config.kdl instead. Then start your app to regenerate this file.
+          # This is a generated File. Do not directly alter this file and expect any changes.
+          # Modify db/config.kdl instead. Then start your app to regenerate this file.
 
-  default:
-    adapter: sqlite3
-    database: ddddddd/camping.db
-    host: localhost
-    pool: 5
-    timeout: 5000
+          default:
+            adapter: sqlite3
+            database: ddddddd/camping.db
+            host: localhost
+            pool: 5
+            timeout: 5000
 
-  development:
-    adapter: sqlite3
-    database: ddddddd/camping.db
-    host: localhost
-    pool: 5
-    timeout: 5000
+          development:
+            adapter: sqlite3
+            database: ddddddd/camping.db
+            host: localhost
+            pool: 5
+            timeout: 5000
 
-  production:
-    adapter: sqlite3
-    database: ddddddd/camping.db
-    host: localhost
-    pool: 5
-    timeout: 5000
+          production:
+            adapter: sqlite3
+            database: ddddddd/camping.db
+            host: localhost
+            pool: 5
+            timeout: 5000
+      TXT
 
-TXT
+      RAKEFILE =  <<~TXT
+        # Rakefile
+        require 'rake'
+        require 'rake/clean'
+        require 'rake/testtask'
+      TXT
 
-        RAKEFILE_APPENDS = <<-TXT
-# Add database migrations to your Rakefile.
-begin
-  require "cairn"
-  require "guidebook"
-  StandaloneMigrations::Tasks.load_tasks
-rescue LoadError => e
-  puts "gem install cairn to get db:migrate:* tasks! (Error: \#{e})"
-end
-TXT
+      RAKEFILE_APPENDS = <<~TXT
+        # Add database migrations to your Rakefile.
+        begin
+          require "cairn"
+          require "guidebook"
+          StandaloneMigrations::Tasks.load_tasks
+        rescue LoadError => e
+          puts "gem install cairn to get db:migrate:* tasks! (Error: \#{e})"
+        end
+      TXT
 
     end
 

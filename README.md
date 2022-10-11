@@ -55,14 +55,13 @@ end
 
 Just do it!
 
+## Adding Rake tasks to your Rakefile
 
 ## Making a new migration
 
 ## Running your migration
 
 ## Rolling back a migration
-
-
 
 ### Todo
 - [ ] Support database_url, and using environment variables as the database thing.
@@ -71,6 +70,7 @@ Just do it!
 - [ ] Finish work on Camping 3.0 so that this gem can be used like legit.
 - [ ] Write some guides on how to use Active Record.
 - [ ] Add copyright thing.
+- [ ] Add Feedback to Guidebook Install Command.
 
 ### Done
 - [x] Add camping as a development dependency.
@@ -88,3 +88,5 @@ Just do it!
 - [x] Move the db directory to test, then rewrite the test suite to generate these files.
 - [x] Map migration commands to Rake automatically somehow.
 - [x] Map Generators to rake somehow too.
+- [x] Add config.yml generation to the install sequence.
+- [x] Improve Guidebook to NOT add anything to the rake file if cairn is included and the standalone_migrations tasks.
