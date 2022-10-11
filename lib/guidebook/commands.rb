@@ -6,16 +6,14 @@ module Camping
 
     class << self
       def parse
-        options = Camping::GuideBook::Options.new
-        parse_commands(options)
+        parse_commands()
       end
 
       protected
 
-      def parse_commands(options_object)
-        options = options_object.options
-        parser  = options_object.parser
-        commands = []
+      def parse_commands()
+        op_obj = Camping::GuideBook::Options.new
+        options, parser, commands = op_obj.options, op_obj.parser, []
         ARGV.each do |cmd|
           commands << cmd
         end
@@ -58,6 +56,7 @@ module Camping
         create_db_folder(dir)
         create_migrate_folder(dir)
         create_config_kdl(dir)
+        create_config_yml(dir)
         add_commands_to_rakefile()
       end
 
@@ -77,6 +76,12 @@ module Camping
         File.open(file, 'w') { |f| f.write CONFIG_KDL } unless File.exist?(file)
       end
 
+      def create_config_yml(dir)
+        file = "#{dir}/config.yml"
+        CONFIG_YML["ddddddd"] = dir
+        File.open(file, 'w') { |f| f.write CONFIG_YML } unless File.exist?(file)
+      end
+
       def add_commands_to_rakefile()
         File.open('Rakefile', 'a') { |f| f.write("\n#{RAKEFILE_APPENDS}") }
       end
@@ -91,15 +96,46 @@ module Camping
   }
 TXT
 
+      CONFIG_YML = <<-TXT
+# db/config.yml
+
+  # This is a generated File. Do not directly alter this file and expect any changes.
+  # Modify db/config.kdl instead. Then start your app to regenerate this file.
+
+  default:
+    adapter: sqlite3
+    database: ddddddd/camping.db
+    host: localhost
+    pool: 5
+    timeout: 5000
+
+  development:
+    adapter: sqlite3
+    database: ddddddd/camping.db
+    host: localhost
+    pool: 5
+    timeout: 5000
+
+  production:
+    adapter: sqlite3
+    database: ddddddd/camping.db
+    host: localhost
+    pool: 5
+    timeout: 5000
+
+TXT
+
         RAKEFILE_APPENDS = <<-TXT
 # Add database migrations to your Rakefile.
 begin
   require "cairn"
+  require "guidebook"
   StandaloneMigrations::Tasks.load_tasks
 rescue LoadError => e
   puts "gem install cairn to get db:migrate:* tasks! (Error: \#{e})"
 end
 TXT
+
     end
 
     class Options
