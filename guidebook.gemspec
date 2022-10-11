@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = "guidebook"
-  s.version     = "0.0.7"
+  s.version     = "0.0.8"
   s.summary     = "Active Record in your Camping app"
   s.description = "Want models? Want migrations? GuideBook is a Camping Gear to give you Database persistence and models through ActiveRecord."
   s.authors     = ["Karl Oscar Weber"]
